@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.jason.jasonhttputil.AsyncBaseClient;
+import com.jason.jasonhttputil.AsyncClientInterface;
 import com.jason.jasonhttputil.BaseClient;
+import com.jason.jasonhttputil.DefaultAsyncClient;
 import com.jason.jasonhttputil.FileBody;
 import com.jason.jasonhttputil.RequestParam;
 import com.jason.jasonhttputil.Response;
@@ -26,19 +29,11 @@ public class MainActivity extends AppCompatActivity {
         params.addParams("user_uuid", "18081917451");
         params.addParams("area_id", 322);
 
-        new Thread() {
+        AsyncBaseClient baseClient = new AsyncBaseClient();
+        baseClient.asyncPost("http://47.94.155.143/consume/index.php/home/merchant/homepage", params, new DefaultAsyncClient() {
             @Override
-            public void run() {
-                super.run();
-                BaseClient baseClient = new BaseClient();
-                final Response response = baseClient.post("http://47.94.155.143/consume/index.php/home/merchant/homepage", params);
-                tv.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv.setText(response.toString());
-
-                    }
-                });
+            public void callBack(Response response) {
+                tv.setText(response.toString());
                 if (response.getCookies() != null) {
                     for (String key : response.getCookies().keySet()) {
                         Log.e(key, response.getCookies().get(key) + "xxxxxxx");
@@ -47,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("log", "xxxxxxxxxx");
                 }
                 Log.e("log", response.toString());
-
             }
-        }.start();
+        });
+
 
     }
 
