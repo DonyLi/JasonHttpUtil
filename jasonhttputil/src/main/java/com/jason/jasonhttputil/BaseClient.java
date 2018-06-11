@@ -6,14 +6,41 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BaseClient implements Client {
     private int timeOut = 5000;
     private String charset = "UTF-8";
     private HttpURLConnection urlConnection;
+    private String set_cookie = "Set-Cookie";
 
+    private void initHeader(Response response) {
+        Map<String, List<String>> headers = urlConnection.getHeaderFields();
+        response.setHeaders(headers);
+        List<String> cookies = headers.get(set_cookie);
+        if (cookies != null) {
+            HashMap<String, String> cookiesMap = new HashMap<>();
+            for (String key : cookies) {
+                if (key != null) {
+                    String[] cookieString = key.split(";");
+                    for (int i = 0; i < cookieString.length; i++) {
+                        String[] map = cookieString[i].split("\\=");
+                        if (map.length == 1) {
+                            cookiesMap.put(map[0], null);
+                        } else {
+                            cookiesMap.put(map[0], cookieString[i].substring(map[0].length() + 1));
+                        }
+                    }
+                }
+            }
+            response.setCookies(cookiesMap);
+        }
+
+    }
 
     @Override
     public Response post(String urlString, RequestParam param) {
@@ -31,7 +58,13 @@ public class BaseClient implements Client {
             urlConnection.setDoInput(true);
             // 设置是否使用缓存
             urlConnection.setUseCaches(false);
+            if (param.getCookies().size() > 0) {
+                for (String key : param.getCookies().keySet()) {
+                    urlConnection.setRequestProperty(key, param.getCookies().get(key));
 
+                }
+
+            }
             urlConnection.setRequestProperty("Accept-Charset", charset);
             urlConnection.setRequestProperty("Connection", "keep-alive");
             if (param.fileBodies.size() > 0) {
@@ -60,6 +93,11 @@ public class BaseClient implements Client {
                 }
             }
             response.setCode(urlConnection.getResponseCode());
+            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                initHeader(response);
+
+            }
+
             InputStream inputStream = urlConnection.getInputStream();
             response.setResult(inputStream2Byte(inputStream));
             inputStream.close();
@@ -120,11 +158,18 @@ public class BaseClient implements Client {
             urlConnection.setDoInput(true);
             // 设置是否使用缓存
             urlConnection.setUseCaches(false);
+            if (param.getCookies().size() > 0) {
+                for (String key : param.getCookies().keySet()) {
+                    urlConnection.setRequestProperty(key, param.getCookies().get(key));
+
+                }
+            }
             urlConnection.setRequestProperty("Accept-Charset", charset);
             urlConnection.connect();
-
-
             response.setCode(urlConnection.getResponseCode());
+            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                initHeader(response);
+            }
             InputStream inputStream = urlConnection.getInputStream();
             response.setResult(inputStream2Byte(inputStream));
             inputStream.close();

@@ -20,25 +20,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView tv = findViewById(R.id.tv);
-        final RequestParam param = new RequestParam();
+        final RequestParam params = new RequestParam();
         File file = new File(Environment.getExternalStorageDirectory(), "Pictures/Screenshots/Screenshot_2018-01-24-17-43-51.png");
         Log.e("log", file.exists() + "");
-        param.addParams("type", "admin/user/header")
-                .addParams("imgFile", new FileBody("tem1.jpg", "image/png", file));
+        params.addParams("user_uuid", "18081917451");
+        params.addParams("area_id", 322);
 
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 BaseClient baseClient = new BaseClient();
-                final Response response = baseClient.post("http://47.94.155.143/kunerUploader/php/upload_json.php", param);
+                final Response response = baseClient.post("http://47.94.155.143/consume/index.php/home/merchant/homepage", params);
                 tv.post(new Runnable() {
                     @Override
                     public void run() {
                         tv.setText(response.toString());
+
                     }
                 });
-
+                if (response.getCookies() != null) {
+                    for (String key : response.getCookies().keySet()) {
+                        Log.e(key, response.getCookies().get(key) + "xxxxxxx");
+                    }
+                } else {
+                    Log.e("log", "xxxxxxxxxx");
+                }
                 Log.e("log", response.toString());
 
             }

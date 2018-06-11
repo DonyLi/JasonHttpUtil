@@ -7,6 +7,13 @@ import java.util.List;
 public class RequestParam {
     HashMap<String, String> map = new HashMap<>();
     List<FileBody> fileBodies = new ArrayList<>();
+    private HashMap<String, String> cookies = new HashMap<>();
+
+
+
+    public HashMap<String, String> getCookies() {
+        return cookies;
+    }
 
     public RequestParam addParams(String key, String value) {
         if (key != null) {
@@ -43,6 +50,10 @@ public class RequestParam {
         return this;
     }
 
+    public RequestParam addHeader(String key, String value) {
+        cookies.put(key, value);
+        return this;
+    }
 
     public String splitParams(String method) {
 
