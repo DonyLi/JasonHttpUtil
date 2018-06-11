@@ -1,5 +1,6 @@
 package com.jason.jasonhttputil;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,13 +34,30 @@ public class BaseClient implements Client {
 
             urlConnection.setRequestProperty("Accept-Charset", charset);
             urlConnection.setRequestProperty("Connection", "keep-alive");
-            urlConnection.connect();
+            if (param.fileBodies.size() > 0) {
+                urlConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + Config.BOUNDARY);
+                urlConnection.connect();
 
-            String outParams = param.splitParams("POST");
-            if (outParams.length() > 0) {
                 OutputStream out = urlConnection.getOutputStream();
-                out.write(outParams.getBytes());
+                String outParams = param.splitParams("POST_FILE");
+                if (outParams.length() > 0) {
+                    out.write(outParams.getBytes());
+                }
+                for (int i = 0; i < param.fileBodies.size(); i++) {
+                    PostFile(param.fileBodies.get(i), out);
+                }
+                byte[] end_data = (Config.PREFIX + Config.BOUNDARY + Config.PREFIX + Config.LINEND).getBytes();
+                out.write(end_data);
                 out.close();
+
+            } else {
+                urlConnection.connect();
+                String outParams = param.splitParams("POST");
+                if (outParams.length() > 0) {
+                    OutputStream out = urlConnection.getOutputStream();
+                    out.write(outParams.getBytes());
+                    out.close();
+                }
             }
             response.setCode(urlConnection.getResponseCode());
             InputStream inputStream = urlConnection.getInputStream();
@@ -55,6 +73,29 @@ public class BaseClient implements Client {
         }
 
         return response;
+    }
+
+    private void PostFile(FileBody fileBody, OutputStream out) throws IOException {
+        if (fileBody.getFile().exists()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(Config.PREFIX);
+            sb.append(Config.BOUNDARY);
+            sb.append(Config.LINEND);
+            // name是post中传参的键 filename是文件的名称
+            sb.append("Content-Disposition: form-data; name=\"" + (fileBody.getKey())
+                    + "\"; filename=\"" + fileBody.getFileName() + "\"" + Config.LINEND);
+            sb.append("Content-Type: " + fileBody.getContentType() + "; charset=UTF-8" + Config.LINEND);
+            sb.append(Config.LINEND);
+            out.write(sb.toString().getBytes());
+            FileInputStream fileInputStream = new FileInputStream(fileBody.getFile());
+            byte[] bytes = new byte[1024 * 10];
+            int total = 0;
+            while ((total = fileInputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, total);
+            }
+            out.write(Config.LINEND.getBytes());
+        }
+
     }
 
     @Override

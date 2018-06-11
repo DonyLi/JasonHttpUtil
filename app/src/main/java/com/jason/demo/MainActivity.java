@@ -1,13 +1,17 @@
 package com.jason.demo;
 
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.jason.jasonhttputil.BaseClient;
+import com.jason.jasonhttputil.FileBody;
 import com.jason.jasonhttputil.RequestParam;
 import com.jason.jasonhttputil.Response;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,18 +21,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView tv = findViewById(R.id.tv);
         final RequestParam param = new RequestParam();
-        param.addParams("routeId", 103);
-        param.addParams("user_uuid", "7F1495582C27EFAC68022132");
-        param.addParams("token", "xfb_9C7C707025D059A60655EF3F");
-        param.addParams("p", 1);
-        param.addParams("name", "成都");
+        File file = new File(Environment.getExternalStorageDirectory(), "Pictures/Screenshots/Screenshot_2018-01-24-17-43-51.png");
+        Log.e("log", file.exists() + "");
+        param.addParams("type", "admin/user/header")
+                .addParams("imgFile", new FileBody("tem1.jpg", "image/png", file));
 
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 BaseClient baseClient = new BaseClient();
-                final Response response = baseClient.get("http://47.94.155.143/consume/index.php/Home/User/agencyProfit", param);
+                final Response response = baseClient.post("http://47.94.155.143/kunerUploader/php/upload_json.php", param);
                 tv.post(new Runnable() {
                     @Override
                     public void run() {
