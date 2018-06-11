@@ -1,9 +1,9 @@
 package com.jason.jasonhttputil;
 
-public interface AsyncClientInterface {
+public interface AsyncClientInterface<T> {
     void runForeground(Runnable runnable);
 
     void runBackground(Runnable runnable);
 
-    void callBack(Response response);
+    void callBack(T response);
 }

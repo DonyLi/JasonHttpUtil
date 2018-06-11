@@ -1,7 +1,7 @@
 package com.jason.jasonhttputil;
 
 public class AsyncBaseClient extends BaseClient {
-    public void asyncPost(final String url, final RequestParam param, final AsyncClientInterface anInterface) {
+    public void asyncPost(final String url, final RequestParam param, final AsyncClientInterface<Response> anInterface) {
         anInterface.runBackground(new Runnable() {
             @Override
             public void run() {
@@ -18,7 +18,7 @@ public class AsyncBaseClient extends BaseClient {
 
     }
 
-    public void asyncGet(final String url, final RequestParam param, final AsyncClientInterface anInterface) {
+    public void asyncGet(final String url, final RequestParam param, final AsyncClientInterface<Response> anInterface) {
         anInterface.runBackground(new Runnable() {
             @Override
             public void run() {

@@ -11,6 +11,7 @@ import com.jason.jasonhttputil.AsyncClientInterface;
 import com.jason.jasonhttputil.BaseClient;
 import com.jason.jasonhttputil.DefaultAsyncClient;
 import com.jason.jasonhttputil.FileBody;
+import com.jason.jasonhttputil.HttpClient;
 import com.jason.jasonhttputil.RequestParam;
 import com.jason.jasonhttputil.Response;
 
@@ -29,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
         params.addParams("user_uuid", "18081917451");
         params.addParams("area_id", 322);
 
-        AsyncBaseClient baseClient = new AsyncBaseClient();
-        baseClient.asyncPost("http://47.94.155.143/consume/index.php/home/merchant/homepage", params, new DefaultAsyncClient() {
+        HttpClient baseClient = new HttpClient();
+        baseClient.asyncPost("http://47.94.155.143/consume/index.php/home/merchant/homepage", params, new DefaultAsyncClient<Response>() {
             @Override
             public void callBack(Response response) {
                 tv.setText(response.toString());
