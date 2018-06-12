@@ -10,6 +10,7 @@ import com.jason.jasonhttputil.AsyncBaseClient;
 import com.jason.jasonhttputil.AsyncClientInterface;
 import com.jason.jasonhttputil.BaseClient;
 import com.jason.jasonhttputil.DefaultAsyncClient;
+import com.jason.jasonhttputil.DownLoadProgressListener;
 import com.jason.jasonhttputil.FileBody;
 import com.jason.jasonhttputil.HttpClient;
 import com.jason.jasonhttputil.RequestParam;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         params.addParams("area_id", 322);
 
         HttpClient baseClient = new HttpClient();
+
         baseClient.asyncPost("http://47.94.155.143/consume/index.php/home/merchant/homepage", params, new DefaultAsyncClient<Response>() {
             @Override
             public void callBack(Response response) {
@@ -46,7 +48,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        AsyncBaseClient asyncBaseClient = new AsyncBaseClient();
+        asyncBaseClient.downLoad("http://47.94.155.143/consume/index.php/home/merchant/homepage", "path");
+        asyncBaseClient.asyncDownload("http://47.94.155.143/consume/index.php/home/merchant/homepage", "path", new DefaultAsyncClient<Response>() {
+            @Override
+            public void callBack(Response response) {
 
+            }
+        });
+        asyncBaseClient.setProgressListener(new DownLoadProgressListener() {
+            @Override
+            public void downLoading(int progress, int total) {
+
+            }
+        });
     }
 
 

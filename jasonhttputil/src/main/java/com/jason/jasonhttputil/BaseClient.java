@@ -1,6 +1,8 @@
 package com.jason.jasonhttputil;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,6 +19,11 @@ public class BaseClient implements Client {
     private String charset = "UTF-8";
     private HttpURLConnection urlConnection;
     private String set_cookie = "Set-Cookie";
+    private DownLoadProgressListener progressListener;
+
+    public void setProgressListener(DownLoadProgressListener progressListener) {
+        this.progressListener = progressListener;
+    }
 
     private void initHeader(Response response) {
         Map<String, List<String>> headers = urlConnection.getHeaderFields();
@@ -196,6 +203,60 @@ public class BaseClient implements Client {
 
     }
 
+    @Override
+    public Response downLoad(String urlString, String path) {
+        Response response = new Response();
+
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            this.urlConnection = urlConnection;
+            urlConnection.setRequestMethod("GET");
+            // 超时时间
+            urlConnection.setConnectTimeout(timeOut);
+            // 设置是否输出
+            urlConnection.setDoOutput(false);
+            // 设置是否读入
+            urlConnection.setDoInput(true);
+            // 设置是否使用缓存
+            urlConnection.setUseCaches(false);
+            urlConnection.setRequestProperty("Accept-Charset", charset);
+            urlConnection.connect();
+            response.setCode(urlConnection.getResponseCode());
+            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                initHeader(response);
+            }
+            int totalLength = urlConnection.getContentLength();
+            InputStream inputStream = urlConnection.getInputStream();
+            File file = new File(path);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            byte[] bytes = new byte[1024 * 10];
+            int length = 0;
+            int total = 0;
+            while ((total = inputStream.read(bytes)) != -1) {
+                fileOutputStream.write(bytes, 0, total);
+                length += total;
+                downLoading(length, totalLength);
+            }
+            fileOutputStream.close();
+            inputStream.close();
+
+
+        } catch (
+                Exception e)
+
+        {
+            e.printStackTrace();
+            response.setThrowable(e);
+        } finally
+
+        {
+            this.urlConnection = null;
+        }
+
+        return response;
+    }
+
     private byte[] inputStream2Byte(InputStream inputStream) throws IOException {
         List<byte[]> bytesList = new ArrayList<>();
         byte[] bytes = new byte[1024];
@@ -234,5 +295,10 @@ public class BaseClient implements Client {
         this.charset = charset;
     }
 
+    protected void downLoading(int length, int totalLength) {
+        if (progressListener != null) {
+            progressListener.downLoading(length * 100 / totalLength, totalLength);
+        }
+    }
 
 }

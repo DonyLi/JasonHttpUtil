@@ -6,4 +6,6 @@ public interface Client {
     Response get(String url, RequestParam param);
 
     boolean cancle();
+
+    Response downLoad(String url, String path);
 }
