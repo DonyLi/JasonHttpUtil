@@ -7,12 +7,11 @@ import java.util.List;
 public class RequestParam {
     HashMap<String, String> map = new HashMap<>();
     List<FileBody> fileBodies = new ArrayList<>();
-    private HashMap<String, String> cookies = new HashMap<>();
+    private HashMap<String, String> header = new HashMap<>();
 
 
-
-    public HashMap<String, String> getCookies() {
-        return cookies;
+    public HashMap<String, String> getHeader() {
+        return header;
     }
 
     public RequestParam addParams(String key, String value) {
@@ -50,8 +49,15 @@ public class RequestParam {
         return this;
     }
 
+    //添加头文件
     public RequestParam addHeader(String key, String value) {
-        cookies.put(key, value);
+        header.put(key, value);
+        return this;
+    }
+
+    //断点下载
+    public RequestParam addPieces(int start, int end) {
+        header.put("Range", "bytes=" + start + "-" + end);
         return this;
     }
 

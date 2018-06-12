@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +64,9 @@ public class BaseClient implements Client {
             urlConnection.setDoInput(true);
             // 设置是否使用缓存
             urlConnection.setUseCaches(false);
-            if (param.getCookies().size() > 0) {
-                for (String key : param.getCookies().keySet()) {
-                    urlConnection.setRequestProperty(key, param.getCookies().get(key));
+            if (param.getHeader().size() > 0) {
+                for (String key : param.getHeader().keySet()) {
+                    urlConnection.setRequestProperty(key, param.getHeader().get(key));
 
                 }
 
@@ -165,9 +164,9 @@ public class BaseClient implements Client {
             urlConnection.setDoInput(true);
             // 设置是否使用缓存
             urlConnection.setUseCaches(false);
-            if (param.getCookies().size() > 0) {
-                for (String key : param.getCookies().keySet()) {
-                    urlConnection.setRequestProperty(key, param.getCookies().get(key));
+            if (param.getHeader().size() > 0) {
+                for (String key : param.getHeader().keySet()) {
+                    urlConnection.setRequestProperty(key, param.getHeader().get(key));
 
                 }
             }
@@ -223,7 +222,7 @@ public class BaseClient implements Client {
             urlConnection.setRequestProperty("Accept-Charset", charset);
             urlConnection.connect();
             response.setCode(urlConnection.getResponseCode());
-            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK || urlConnection.getResponseCode() == HttpURLConnection.HTTP_PARTIAL) {
                 initHeader(response);
             }
             int totalLength = urlConnection.getContentLength();
@@ -242,12 +241,10 @@ public class BaseClient implements Client {
             inputStream.close();
 
 
-        } catch (
-                Exception e)
-
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             response.setThrowable(e);
+
         } finally
 
         {
