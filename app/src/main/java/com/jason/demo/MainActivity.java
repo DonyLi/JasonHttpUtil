@@ -39,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
                 tv.setText(response.toString());
                 if (response.getCookies() != null) {
                     for (String key : response.getCookies().keySet()) {
-                        Log.e(key, response.getCookies().get(key) + "xxxxxxx");
+                        Log.e(key, response.getCookies().get(key) + "TAG");
                     }
                 } else {
-                    Log.e("log", "xxxxxxxxxx");
+                    Log.e("log", "TAG");
                 }
                 Log.e("log", response.toString());
             }
